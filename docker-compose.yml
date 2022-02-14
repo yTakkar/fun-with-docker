@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  app:
+    build: 
+      context: app
+    ports: 
+      - 3000:3000
+    depends_on: 
+      - mysql
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: /run/secrets/db-password
+      MYSQL_DB: todos
+    secrets:
+      - db-password
+    
+  mysql:
+    image: mysql:8.0.27
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes: 
+      - mysql-data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=todos
+      - MYSQL_ROOT_PASSWORD=/run/secrets/db-password
+    secrets:
+      - db-password
+
+volumes: 
+  mysql-data:
+
+secrets:
+  db-password:
+    file: ./db-password.txt
